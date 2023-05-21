@@ -29,10 +29,16 @@ public struct BreezeLambdaAPIClient<Item: KeyedCodable> {
     let headers: RequestHeaders
     let requestBuilder: BreezeRequest<Item>
     
-    public init(env: APIClientEnv, path: String, headers: RequestHeaders) {
+    public init(env: APIClientEnv, path: String, additionalHeaders: RequestHeaders) {
         self.env = env
         self.path = path
-        self.headers = headers
+        let requiredHeaders: RequestHeaders = [
+            "Content-Type": "application/json",
+            "cache-control": "no-cache",
+        ]
+        self.headers = requiredHeaders.merging(additionalHeaders, uniquingKeysWith: { _, new in
+            new
+        })
         self.requestBuilder = BreezeRequest<Item>(env: env, path: path, headers: headers)
     }
     
@@ -48,34 +54,38 @@ public struct BreezeLambdaAPIClient<Item: KeyedCodable> {
         env.logger?.log(data: data, for: response)
     }
     
-    public func create(item: Item) async throws -> Item {
-        let request = try requestBuilder.create(item: item)
+    public func create(token: String?, item: Item) async throws -> Item {
+        let request = try requestBuilder.create(token: token, item: item)
         let (data, response) = try await env.session.data(for: request)
         try validateResponse(data: data, response: response)
         return try env.decoder.decode(Item.self, from: data)
     }
     
-    public func read(key: String) async throws -> Item {
-        let request = try requestBuilder.read(key: key)
+    public func read(token: String?, key: String) async throws -> Item {
+        let request = try requestBuilder.read(token: token, key: key)
         let (data, response) = try await env.session.data(for: request)
         try validateResponse(data: data, response: response)
         return try env.decoder.decode(Item.self, from: data)
     }
     
-    public func update(item: Item) async throws -> Item {
-        let request = try requestBuilder.update(item: item)
+    public func update(token: String?, item: Item) async throws -> Item {
+        let request = try requestBuilder.update(token: token, item: item)
         let (data, response) = try await env.session.data(for: request)
         try validateResponse(data: data, response: response)
         return try env.decoder.decode(Item.self, from: data)
     }
     
-    public func delete(key: String) async throws {
-        let request = try requestBuilder.delete(key: key)
+    public func delete(token: String?, key: String, createdAt: String, updatedAt: String) async throws {
+        let queryItems = [
+            URLQueryItem(name: "createdAt", value: createdAt),
+            URLQueryItem(name: "updatedAt", value: updatedAt)
+        ]
+        let request = try requestBuilder.delete(token: token, key: key, queryItems: queryItems)
         let (data, response) = try await env.session.data(for: request)
         try validateResponse(data: data, response: response)
     }
     
-    public func list(exclusiveStartKey: String?, limit: Int?) async throws -> [Item] {
+    public func list(token: String?, exclusiveStartKey: String?, limit: Int?) async throws -> [Item] {
         var queryItems: [URLQueryItem] = []
         if let exclusiveStartKey {
             queryItems.append(URLQueryItem(name: "exclusiveStartKey", value: exclusiveStartKey))
@@ -83,7 +93,7 @@ public struct BreezeLambdaAPIClient<Item: KeyedCodable> {
         if let limit {
             queryItems.append(URLQueryItem(name: "limit", value: "\(limit)"))
         }
-        let request = try requestBuilder.list(queryItems: queryItems)
+        let request = try requestBuilder.list(token: token, queryItems: queryItems)
         let (data, response) = try await env.session.data(for: request)
         try validateResponse(data: data, response: response)
         return try env.decoder.decode(Items<Item>.self, from: data).items

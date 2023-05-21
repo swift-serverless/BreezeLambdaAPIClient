@@ -20,38 +20,50 @@ struct BreezeRequest<Item: KeyedCodable> {
     let path: String
     let headers: RequestHeaders
     
+    func authorizedHeaders(token: String?) -> RequestHeaders {
+        guard let token else { return headers }
+        var authorizedHeaders = headers
+        authorizedHeaders["Authorization"] = "Bearer \(token)"
+        return authorizedHeaders
+    }
+    
     init(env: APIClientEnv, path: String, headers: RequestHeaders) {
         self.env = env
         self.path = path
         self.headers = headers
     }
     
-    func create(item: Item) throws -> URLRequest {
+    func create(token: String?, item: Item) throws -> URLRequest {
         let body = try env.encoder.encode(item)
         let endpoint = APIEndpoint(env: env, path: path, queryItems: nil)
-        return try APIRequestBuilder.post(env: env, endpoint: endpoint, headers: headers, body: body)
+        let authorizedHeaders = authorizedHeaders(token: token)
+        return try APIRequestBuilder.post(env: env, endpoint: endpoint, headers: authorizedHeaders, body: body)
     }
     
-    func read(key: String) throws -> URLRequest {
+    func read(token: String?, key: String) throws -> URLRequest {
         let keyedPath = "\(path)/\(key)"
         let endpoint = APIEndpoint(env: env, path: keyedPath, queryItems: nil)
-        return try APIRequestBuilder.get(env: env, endpoint: endpoint, headers: headers)
+        let authorizedHeaders = authorizedHeaders(token: token)
+        return try APIRequestBuilder.get(env: env, endpoint: endpoint, headers: authorizedHeaders)
     }
     
-    func update(item: Item) throws -> URLRequest {
+    func update(token: String?, item: Item) throws -> URLRequest {
         let body = try env.encoder.encode(item)
         let endpoint = APIEndpoint(env: env, path: path, queryItems: nil)
-        return try APIRequestBuilder.put(env: env, endpoint: endpoint, headers: headers, body: body)
+        let authorizedHeaders = authorizedHeaders(token: token)
+        return try APIRequestBuilder.put(env: env, endpoint: endpoint, headers: authorizedHeaders, body: body)
     }
     
-    func delete(key: String) throws -> URLRequest {
+    func delete(token: String?, key: String, queryItems: [URLQueryItem]?) throws -> URLRequest {
         let keyedPath = "\(path)/\(key)"
-        let endpoint = APIEndpoint(env: env, path: keyedPath, queryItems: nil)
-        return try APIRequestBuilder.delete(env: env, endpoint: endpoint, headers: headers)
+        let endpoint = APIEndpoint(env: env, path: keyedPath, queryItems: queryItems)
+        let authorizedHeaders = authorizedHeaders(token: token)
+        return try APIRequestBuilder.delete(env: env, endpoint: endpoint, headers: authorizedHeaders)
     }
     
-    func list(queryItems: [URLQueryItem]?) throws -> URLRequest {
+    func list(token: String?, queryItems: [URLQueryItem]?) throws -> URLRequest {
         let endpoint = APIEndpoint(env: env, path: path, queryItems: queryItems)
-        return try APIRequestBuilder.get(env: env, endpoint: endpoint, headers: headers)
+        let authorizedHeaders = authorizedHeaders(token: token)
+        return try APIRequestBuilder.get(env: env, endpoint: endpoint, headers: authorizedHeaders)
     }
 }
