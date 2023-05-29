@@ -6,7 +6,7 @@ This is a client for the [Breeze Lambda API](https://github.com/swift-sprinter/B
 
 ## Installation
 
-### Swift Pacakge Manager
+### Swift Package Manager
 
 Add BreezeLambdaAPIClient as a dependency to the dependencies value of your `Package.swift`.
 
