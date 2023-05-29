@@ -29,19 +29,23 @@ The `Item` must be shared between the client and the [Breeze Lambda API](https:/
 import Foundation
 import BreezeLambdaAPIClient
 
-struct Item: Codable {
-    var key: String?
-    var name: String
-    var description: String
-    var createdAt: Date?
-    var updatedAt: Date?
+protocol ItemServing {
+    func create(item: Item) async throws -> Item
+    func read(key: String) async throws -> Item
+    func update(item: Item) async throws -> Item
+    func delete(item: Item) async throws
+    func list(startKey: String?, limit: Int?) async throws -> [Item]
 }
 
-struct APIService {
+struct ItemService: ItemServing {
     
     private let apiClient: BreezeLambdaAPIClient<Item>
     
-    private var token: String? 
+    private let session: SessionService
+    
+    private var token: String? {
+        session.userSession?.jwtToken
+    }
     
     init(session: SessionService) {
         guard var env = try? APIEnvironment.dev() else {
@@ -49,27 +53,27 @@ struct APIService {
         }
         env.logger = Logger()
         self.session = session
-        self.apiClient = BreezeLambdaAPIClient<Item>(env: env, path: "forms", additionalHeaders: [:])
+        self.apiClient = BreezeLambdaAPIClient<Item>(env: env, path: "items", additionalHeaders: [:])
     }
     
-    func create(form: Item) async throws -> Item {
-        try await apiClient.create(token: token, item: form)
+    func create(item: Item) async throws -> Item {
+        try await apiClient.create(token: token, item: item)
     }
     
     func read(key: String) async throws -> Item {
         try await apiClient.read(token: token, key: key)
     }
     
-    func update(form: Item) async throws -> Item {
-        try await apiClient.update(token: token, item: form)
+    func update(item: Item) async throws -> Item {
+        try await apiClient.update(token: token, item: item)
     }
     
-    func delete(form: Item) async throws {
-        guard let updatedAt = form.updatedAt,
-              let createdAt = form.createdAt else {
-            throw FormServiceError.invalidForm
+    func delete(item: Item) async throws {
+        guard let updatedAt = item.updatedAt,
+              let createdAt = item.createdAt else {
+            throw ItemServiceError.invalidItem
         }
-        try await apiClient.delete(token: token, key: form.key, createdAt: createdAt, updatedAt: updatedAt)
+        try await apiClient.delete(token: token, key: item.key, createdAt: createdAt, updatedAt: updatedAt)
     }
     
     func list(startKey: String?, limit: Int?) async throws -> [Item] {
@@ -97,7 +101,14 @@ struct Logger: APIClientLogging {
     }
 }
 
-enum FormServiceError: Error {
-    case invalidForm
+enum ItemServiceError: Error {
+    case invalidItem
 }
 ```
+
+Note:
+The SessionService is used to get the JWT token. The session is not part of this package.
+
+# Contributing
+
+Contributions are more than welcome! Follow this [guide](https://github.com/swift-sprinter/BreezeLambdaAPIClient/blob/main/CONTRIBUTING.md) to contribute.
