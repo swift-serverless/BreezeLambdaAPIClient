@@ -13,7 +13,7 @@ Add BreezeLambdaAPIClient as a dependency to the dependencies value of your `Pac
 ```swift
     dependencies: [
         //...
-        .package(url: "https://github.com/swift-sprinter/BreezeLmabdaAPIClient.git", from: "0.2.0"),
+        .package(url: "https://github.com/swift-sprinter/BreezeLambdaAPIClient.git", from: "0.2.0"),
         // ...
     ]
 )
