@@ -1,4 +1,5 @@
 # BreezeLambdaAPIClient
+ ![Breeze CI](https://github.com/swift-sprinter/BreezeLambdaAPIClient/actions/workflows/swift-test.yml/badge.svg) [![codecov](https://codecov.io/gh/swift-sprinter/BreezeLambdaAPIClient/branch/main/graph/badge.svg?token=PJR7YGBSQ0)](https://codecov.io/gh/swift-sprinter/BreezeLambdaAPIClient)
 
 This is a client for the [Breeze Lambda API](https://github.com/swift-sprinter/Breeze) (from version 0.2.0).
 
