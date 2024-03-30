@@ -1,7 +1,7 @@
 # BreezeLambdaAPIClient
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fswift-serverless%2FBreezeLambdaAPIClient%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/swift-serverless/BreezeLambdaAPIClient) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fswift-serverless%2FBreezeLambdaAPIClient%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/swift-serverless/BreezeLambdaAPIClient) ![Breeze CI](https://github.com/swift-sprinter/BreezeLambdaAPIClient/actions/workflows/swift-test.yml/badge.svg) [![codecov](https://codecov.io/gh/swift-sprinter/BreezeLambdaAPIClient/branch/main/graph/badge.svg?token=PJR7YGBSQ0)](https://codecov.io/gh/swift-sprinter/BreezeLambdaAPIClient)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fswift-serverless%2FBreezeLambdaAPIClient%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/swift-serverless/BreezeLambdaAPIClient) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fswift-serverless%2FBreezeLambdaAPIClient%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/swift-serverless/BreezeLambdaAPIClient) ![Breeze CI](https://github.com/swift-serverless/BreezeLambdaAPIClient/actions/workflows/swift-test.yml/badge.svg) [![codecov](https://codecov.io/gh/swift-serverless/BreezeLambdaAPIClient/branch/main/graph/badge.svg?token=PJR7YGBSQ0)](https://codecov.io/gh/swift-serverless/BreezeLambdaAPIClient)
 
-This is a client for the [Breeze Lambda API](https://github.com/swift-sprinter/Breeze) (from version 0.2.0).
+This is a client for the [Breeze Lambda API](https://github.com/swift-serverless/Breeze) (from version 0.2.0).
 
 ![Breeze](logo.png)
 
@@ -14,7 +14,7 @@ Add BreezeLambdaAPIClient as a dependency to the dependencies value of your `Pac
 ```swift
     dependencies: [
         //...
-        .package(url: "https://github.com/swift-sprinter/BreezeLambdaAPIClient.git", from: "0.2.0"),
+        .package(url: "https://github.com/swift-serverless/BreezeLambdaAPIClient.git", from: "0.2.0"),
         // ...
     ]
 )
@@ -24,7 +24,7 @@ Add BreezeLambdaAPIClient as a dependency to the dependencies value of your `Pac
 
 The following example shows how to use the client to create, read, update, delete and list items.
 The `Item` is a struct that conforms to `Codable`.
-The `Item` must be shared between the client and the [Breeze Lambda API](https://github.com/swift-sprinter/Breeze).
+The `Item` must be shared between the client and the [Breeze Lambda API](https://github.com/swift-serverless/Breeze).
 
 ```swift
 import Foundation
@@ -112,4 +112,4 @@ The SessionService is used to get the JWT token. The session is not part of this
 
 # Contributing
 
-Contributions are more than welcome! Follow this [guide](https://github.com/swift-sprinter/BreezeLambdaAPIClient/blob/main/CONTRIBUTING.md) to contribute.
+Contributions are more than welcome! Follow this [guide](https://github.com/swift-serverless/BreezeLambdaAPIClient/blob/main/CONTRIBUTING.md) to contribute.
