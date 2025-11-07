@@ -22,7 +22,7 @@ private struct Items<Item: KeyedCodable>: Codable {
     let items: [Item]
 }
 
-public struct BreezeLambdaAPIClient<Item: KeyedCodable> {
+public struct BreezeLambdaAPIClient<Item: KeyedCodable>: Sendable {
     
     let env: APIClientEnv
     let path: String

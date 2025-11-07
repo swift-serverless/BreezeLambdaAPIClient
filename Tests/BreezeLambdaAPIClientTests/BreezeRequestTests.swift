@@ -12,16 +12,18 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import XCTest
+import Testing
+import Foundation
 @testable import BreezeLambdaAPIClient
 
-final class BreezeRequestTests: XCTestCase {
+@Suite(.serialized)
+final class BreezeRequestTests {
     
-    var environment: APIClientEnv!
-    var sut: BreezeRequest<TestItem>!
+    let environment: APIClientEnv
+    let sut: BreezeRequest<TestItem>
     let baseURL: String = "https://apitest123.execute-api.us-east-1.amazonaws.com"
 
-    override func setUpWithError() throws {
+    init() throws {
         let session = URLSession(configuration: .ephemeral)
         environment = try APIClientEnv(session: session, baseURL: baseURL)
         sut = BreezeRequest(env: environment, path: "items", headers: [
@@ -30,81 +32,82 @@ final class BreezeRequestTests: XCTestCase {
         ])
     }
 
-    override func tearDownWithError() throws {
-        sut = nil
-        environment = nil
-    }
-
-    func testInit() throws {
-        XCTAssertEqual(sut.env.baseURL.absoluteString, baseURL)
-        XCTAssertEqual(sut.path, "items")
-        XCTAssertEqual(sut.headers.count, 2)
-        XCTAssertEqual(sut.headers["Content-Type"], "application/json")
-        XCTAssertEqual(sut.headers["cache-control"], "no-cache")
+    @Test
+    func initialization() throws {
+        #expect(sut.env.baseURL.absoluteString == baseURL)
+        #expect(sut.path == "items")
+        #expect(sut.headers.count == 2)
+        #expect(sut.headers["Content-Type"] == "application/json")
+        #expect(sut.headers["cache-control"] == "no-cache")
     }
     
-    func testCreate() throws {
+    @Test
+    func create() throws {
         let request = try sut.create(token: "some-bearer-token", item: Mocks.item)
-        XCTAssertEqual(request.url?.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com/items")
-        XCTAssertEqual(request.httpMethod, "POST")
-        XCTAssertEqual(request.allHTTPHeaderFields?.count, 3)
-        XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/json")
-        XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer some-bearer-token")
-        XCTAssertNotNil(request.httpBody)
-        let body: TestItem = try XCTUnwrap(request.decodeBody())
-        XCTAssertNotNil(body.key, "key")
-        XCTAssertNotNil(body.arrayValue[0].key, "key")
+        #expect(request.url?.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com/items")
+         #expect(request.httpMethod == "POST")
+         #expect(request.allHTTPHeaderFields?.count == 3)
+         #expect(request.allHTTPHeaderFields?["Content-Type"] == "application/json")
+         #expect(request.allHTTPHeaderFields?["Authorization"] == "Bearer some-bearer-token")
+         #expect(request.httpBody != nil)
+         let body: TestItem = try #require(try request.decodeBody())
+         #expect(body.key == "key")
+         #expect(body.arrayValue[0].key == "key1_0")
     }
     
-    func testRead() throws {
+    @Test
+    func read() throws {
         let request = try sut.read(token: "some-bearer-token", key: "key")
-        XCTAssertEqual(request.url?.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com/items/key")
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertEqual(request.allHTTPHeaderFields?.count, 3)
-        XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/json")
-        XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer some-bearer-token")
-        XCTAssertNil(request.httpBody)
+        #expect(request.url?.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com/items/key")
+        #expect(request.httpMethod == "GET")
+        #expect(request.allHTTPHeaderFields?.count == 3)
+        #expect(request.allHTTPHeaderFields?["Content-Type"] == "application/json")
+        #expect(request.allHTTPHeaderFields?["Authorization"] == "Bearer some-bearer-token")
+        #expect(request.httpBody == nil)
     }
     
-    func testUpdate() throws {
+    @Test
+    func update() throws {
         let request = try sut.update(token: "some-bearer-token", item: Mocks.item)
-        XCTAssertEqual(request.url?.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com/items")
-        XCTAssertEqual(request.httpMethod, "PUT")
-        XCTAssertEqual(request.allHTTPHeaderFields?.count, 3)
-        XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/json")
-        XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer some-bearer-token")
-        XCTAssertNotNil(request.httpBody)
-        let body: TestItem = try XCTUnwrap(request.decodeBody())
-        XCTAssertNotNil(body.key, "key")
-        XCTAssertNotNil(body.arrayValue[0].key, "key")
+        #expect(request.url?.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com/items")
+        #expect(request.httpMethod == "PUT")
+        #expect(request.allHTTPHeaderFields?.count == 3)
+        #expect(request.allHTTPHeaderFields?["Content-Type"] == "application/json")
+        #expect(request.allHTTPHeaderFields?["Authorization"] == "Bearer some-bearer-token")
+        #expect(request.httpBody != nil)
+        let body: TestItem = try #require(try request.decodeBody())
+        #expect(body.key == "key")
+        #expect(body.arrayValue[0].key == "key1_0")
     }
     
-    func testDelete() throws {
+    @Test
+    func delete() throws {
         let queryItems = [
             URLQueryItem(name: "createdAt", value: Date().ISO8601Format()),
             URLQueryItem(name: "updatedAt", value: Date().ISO8601Format())
         ]
         let request = try sut.delete(token: "some-bearer-token", key: "key", queryItems: queryItems)
-        XCTAssertEqual(request.url?.scheme, "https")
-        XCTAssertEqual(request.url?.host, "apitest123.execute-api.us-east-1.amazonaws.com")
-        XCTAssertEqual(request.url?.path, "/items/key")
-        XCTAssertEqual(request.url?.query?.contains("createdAt"), true)
-        XCTAssertEqual(request.url?.query?.contains("updatedAt"), true)
-        XCTAssertEqual(request.httpMethod, "DELETE")
-        XCTAssertEqual(request.allHTTPHeaderFields?.count, 3)
-        XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/json")
-        XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer some-bearer-token")
-        XCTAssertNil(request.httpBody)
+        #expect(request.url?.scheme == "https")
+        #expect(request.url?.host == "apitest123.execute-api.us-east-1.amazonaws.com")
+        #expect(request.url?.path == "/items/key")
+        #expect(request.url?.query?.contains("createdAt") == true)
+        #expect(request.url?.query?.contains("updatedAt") == true)
+        #expect(request.httpMethod == "DELETE")
+        #expect(request.allHTTPHeaderFields?.count == 3)
+        #expect(request.allHTTPHeaderFields?["Content-Type"] == "application/json")
+        #expect(request.allHTTPHeaderFields?["Authorization"] == "Bearer some-bearer-token")
+        #expect(request.httpBody == nil)
     }
     
-    func testList_withoutQueryItems() throws {
+    @Test
+    func list_withoutQueryItems() throws {
         let request = try sut.list(token: "some-bearer-token", queryItems: nil)
-        XCTAssertEqual(request.url?.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com/items")
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertEqual(request.allHTTPHeaderFields?.count, 3)
-        XCTAssertEqual(request.allHTTPHeaderFields?["Content-Type"], "application/json")
-        XCTAssertEqual(request.allHTTPHeaderFields?["Authorization"], "Bearer some-bearer-token")
-        XCTAssertNil(request.httpBody)
+        #expect(request.url?.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com/items")
+        #expect(request.httpMethod == "GET")
+        #expect(request.allHTTPHeaderFields?.count == 3)
+        #expect(request.allHTTPHeaderFields?["Content-Type"] == "application/json")
+        #expect(request.allHTTPHeaderFields?["Authorization"] == "Bearer some-bearer-token")
+        #expect(request.httpBody == nil)
     }
 }
 
