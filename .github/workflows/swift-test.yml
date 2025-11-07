@@ -14,7 +14,7 @@ env:
 jobs:
   swift-tests:
     name: 'Swift Tests'
-    runs-on: macos-13
+    runs-on: macos-15
     defaults:
       run:
         shell: bash
