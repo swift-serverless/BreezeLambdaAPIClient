@@ -19,9 +19,9 @@ import Foundation
 //  https://nshipster.com/nsurlprotocol/
 
 @objc class URLProtocolMock: URLProtocol {
-    static var testURLs = [URL?: Data]()
-    static var response: URLResponse?
-    static var error: Error?
+    nonisolated(unsafe) static var testURLs = [URL?: Data]()
+    nonisolated(unsafe) static var response: URLResponse?
+    nonisolated(unsafe) static var error: Error?
     
     override class func canInit(with request: URLRequest) -> Bool {
         return true

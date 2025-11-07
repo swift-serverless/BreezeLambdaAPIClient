@@ -14,19 +14,30 @@
 
 import Foundation
 
-public struct APIClientEnv {
+public struct APIClientEnv: Sendable {
 
     public let session: URLSession
 
     public let baseURL: URL
     
-    public var cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy
-    public var logger: APIClientLogging?
-    public var decoder: JSONDecoder = JSONDecoder()
-    public var encoder: JSONEncoder = JSONEncoder()
+    public let cachePolicy: NSURLRequest.CachePolicy
+    public let logger: APIClientLogging?
+    public let decoder: JSONDecoder
+    public let encoder: JSONEncoder
 
-    public init(session: URLSession, baseURL: String) throws {
+    public init(
+        session: URLSession,
+        baseURL: String,
+        cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy,
+        logger: APIClientLogging? = nil,
+        decoder: JSONDecoder = JSONDecoder(),
+        encoder: JSONEncoder = JSONEncoder()
+    ) throws {
         self.session = session
+        self.logger = logger
+        self.decoder = decoder
+        self.encoder = encoder
+        self.cachePolicy = cachePolicy
         guard let url = URL(string: baseURL) else {
             throw APIClientError.invalidURL
         }

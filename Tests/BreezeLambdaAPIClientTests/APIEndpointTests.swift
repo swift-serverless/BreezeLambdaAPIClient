@@ -12,50 +12,52 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import XCTest
+import Testing
+import Foundation
 @testable import BreezeLambdaAPIClient
 
-final class APIEndpointTests: XCTestCase {
+@Suite
+struct APIEndpointTests {
     
-    var environment: APIClientEnv!
-    var sut: APIEndpoint!
+    let environment: APIClientEnv
     let baseURL: String = "https://apitest123.execute-api.us-east-1.amazonaws.com"
     
-    override func setUpWithError() throws {
+    init() throws {
         let session = URLSession(configuration: .ephemeral)
         environment = try APIClientEnv(session: session, baseURL: baseURL)
     }
 
-    override func tearDownWithError() throws {
-        environment = nil
+    @Test
+    func initSetPath() throws {
+        let sut = APIEndpoint(env: environment, path: "path", queryItems: [URLQueryItem(name: "name", value: "value")])
+        #expect(sut.path == "path")
     }
     
-    func testInit() throws {
-        sut = APIEndpoint(env: environment, path: "path", queryItems: [URLQueryItem(name: "name", value: "value")])
-        XCTAssertEqual(sut.path, "path")
-    }
-    
-    func testUrl_whenNoPathAndNoQueryItemes() throws {
-        sut = APIEndpoint(env: environment, path: "", queryItems: nil)
+    @Test
+    func url_whenNoPathAndNoQueryItemes() throws {
+        let sut = APIEndpoint(env: environment, path: "", queryItems: nil)
         let url = try sut.url()
-        XCTAssertEqual(url.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com")
+        #expect(url.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com")
     }
     
-    func testUrl_whenNoQueryItemes() throws {
-        sut = APIEndpoint(env: environment, path: "path", queryItems: nil)
+    @Test
+    func url_whenNoQueryItemes() throws {
+        let sut = APIEndpoint(env: environment, path: "path", queryItems: nil)
         let url = try sut.url()
-        XCTAssertEqual(url.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com/path")
+        #expect(url.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com/path")
     }
     
-    func testUrl_whenNoPathAndQueryItemes() throws {
-        sut = APIEndpoint(env: environment, path: "", queryItems: [URLQueryItem(name: "name", value: "value")])
+    @Test
+    func url_whenNoPathAndQueryItemes() throws {
+        let sut = APIEndpoint(env: environment, path: "", queryItems: [URLQueryItem(name: "name", value: "value")])
         let url = try sut.url()
-        XCTAssertEqual(url.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com?name=value")
+        #expect(url.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com?name=value")
     }
     
-    func testUrl_whenQueryItemes() throws {
-        sut = APIEndpoint(env: environment, path: "path", queryItems: [URLQueryItem(name: "name", value: "value")])
+    @Test
+    func url_whenQueryItemes() throws {
+        let sut = APIEndpoint(env: environment, path: "path", queryItems: [URLQueryItem(name: "name", value: "value")])
         let url = try sut.url()
-        XCTAssertEqual(url.absoluteString, "https://apitest123.execute-api.us-east-1.amazonaws.com/path?name=value")
+        #expect(url.absoluteString == "https://apitest123.execute-api.us-east-1.amazonaws.com/path?name=value")
     }
 }

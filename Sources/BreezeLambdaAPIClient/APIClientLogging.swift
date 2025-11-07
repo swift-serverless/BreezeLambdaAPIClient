@@ -14,7 +14,7 @@
 
 import Foundation
 
-public protocol APIClientLogging {
+public protocol APIClientLogging: Sendable {
     func log(request: URLRequest)
     func log(data: Data, for response: URLResponse)
 }
